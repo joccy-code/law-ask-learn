@@ -1,0 +1,523 @@
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { 
+  Users, 
+  MessageSquare, 
+  MessageCircle, 
+  Flag, 
+  Settings, 
+  Activity,
+  Search,
+  Eye,
+  Ban,
+  Trash2,
+  Edit,
+  UserCheck,
+  AlertTriangle,
+  BarChart3,
+  Plus,
+  Bell
+} from "lucide-react";
+
+const Admin = () => {
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Mock data
+  const dashboardStats = {
+    totalUsers: 1247,
+    totalQuestions: 892,
+    totalAnswers: 2341,
+    pendingReports: 12
+  };
+
+  const mockUsers = [
+    { id: 1, username: "john_law", email: "john@example.com", role: "Student", status: "Active", joinedDate: "2024-01-15" },
+    { id: 2, username: "sarah_mentor", email: "sarah@example.com", role: "Mentor", status: "Active", joinedDate: "2024-01-10" },
+    { id: 3, username: "mike_student", email: "mike@example.com", role: "Student", status: "Banned", joinedDate: "2024-01-20" },
+  ];
+
+  const mockQuestions = [
+    { id: 1, title: "Contract Law Question about Consideration", author: "john_law", date: "2024-01-25", topic: "Contract Law", upvotes: 15, reports: 0 },
+    { id: 2, title: "Criminal Law - Elements of Murder", author: "sarah_mentor", date: "2024-01-24", topic: "Criminal Law", upvotes: 23, reports: 1 },
+  ];
+
+  const mockReports = [
+    { id: 1, type: "Question", content: "Contract Law Question about...", reporter: "user123", reason: "Inappropriate content", date: "2024-01-25" },
+    { id: 2, type: "Answer", content: "The answer to this question...", reporter: "user456", reason: "Spam", date: "2024-01-24" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-card">
+        <div className="flex h-16 items-center px-4">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-semibold">Law Q&A Admin Panel</h1>
+          </div>
+          <div className="ml-auto flex items-center space-x-4">
+            <Button variant="ghost" size="icon">
+              <Bell className="h-4 w-4" />
+            </Button>
+            <Badge variant="destructive">{dashboardStats.pendingReports}</Badge>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-64 border-r bg-card">
+          <nav className="space-y-2 p-4">
+            <Button 
+              variant={activeTab === "dashboard" ? "default" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => setActiveTab("dashboard")}
+            >
+              <BarChart3 className="mr-2 h-4 w-4" />
+              Dashboard
+            </Button>
+            <Button 
+              variant={activeTab === "users" ? "default" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => setActiveTab("users")}
+            >
+              <Users className="mr-2 h-4 w-4" />
+              User Management
+            </Button>
+            <Button 
+              variant={activeTab === "questions" ? "default" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => setActiveTab("questions")}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Questions
+            </Button>
+            <Button 
+              variant={activeTab === "answers" ? "default" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => setActiveTab("answers")}
+            >
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Answers
+            </Button>
+            <Button 
+              variant={activeTab === "reports" ? "default" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => setActiveTab("reports")}
+            >
+              <Flag className="mr-2 h-4 w-4" />
+              Reports
+              {dashboardStats.pendingReports > 0 && (
+                <Badge variant="destructive" className="ml-auto">
+                  {dashboardStats.pendingReports}
+                </Badge>
+              )}
+            </Button>
+            <Button 
+              variant={activeTab === "topics" ? "default" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => setActiveTab("topics")}
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Topics
+            </Button>
+            <Button 
+              variant={activeTab === "settings" ? "default" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => setActiveTab("settings")}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </Button>
+            <Button 
+              variant={activeTab === "logs" ? "default" : "ghost"} 
+              className="w-full justify-start"
+              onClick={() => setActiveTab("logs")}
+            >
+              <Activity className="mr-2 h-4 w-4" />
+              Activity Logs
+            </Button>
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          {activeTab === "dashboard" && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold">Dashboard Overview</h2>
+              
+              {/* Stats Cards */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{dashboardStats.totalUsers}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Questions</CardTitle>
+                    <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{dashboardStats.totalQuestions}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Answers</CardTitle>
+                    <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{dashboardStats.totalAnswers}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Pending Reports</CardTitle>
+                    <Flag className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-destructive">{dashboardStats.pendingReports}</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Recent Activity */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                      <span className="text-sm">New report submitted for question #892</span>
+                      <span className="text-xs text-muted-foreground ml-auto">2 min ago</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <UserCheck className="h-4 w-4 text-green-500" />
+                      <span className="text-sm">New user registration: john_law</span>
+                      <span className="text-xs text-muted-foreground ml-auto">5 min ago</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === "users" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">User Management</h2>
+                <div className="flex items-center space-x-2">
+                  <Input placeholder="Search users..." className="w-64" />
+                  <Button variant="outline">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Username</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Joined Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mockUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.username}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant={user.role === "Mentor" ? "default" : "secondary"}>
+                            {user.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={user.status === "Active" ? "default" : "destructive"}>
+                            {user.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{user.joinedDate}</TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Ban className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === "questions" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Question Management</h2>
+                <div className="flex items-center space-x-2">
+                  <Input placeholder="Search questions..." className="w-64" />
+                  <Button variant="outline">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Author</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Topic</TableHead>
+                      <TableHead>Upvotes</TableHead>
+                      <TableHead>Reports</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mockQuestions.map((question) => (
+                      <TableRow key={question.id}>
+                        <TableCell className="font-medium max-w-xs truncate">
+                          {question.title}
+                        </TableCell>
+                        <TableCell>{question.author}</TableCell>
+                        <TableCell>{question.date}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{question.topic}</Badge>
+                        </TableCell>
+                        <TableCell>{question.upvotes}</TableCell>
+                        <TableCell>
+                          {question.reports > 0 ? (
+                            <Badge variant="destructive">{question.reports}</Badge>
+                          ) : (
+                            <span className="text-muted-foreground">0</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === "reports" && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold">Reported Content</h2>
+              
+              <Tabs defaultValue="all">
+                <TabsList>
+                  <TabsTrigger value="all">All Reports</TabsTrigger>
+                  <TabsTrigger value="questions">Questions</TabsTrigger>
+                  <TabsTrigger value="answers">Answers</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="all" className="mt-6">
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Content Preview</TableHead>
+                          <TableHead>Reporter</TableHead>
+                          <TableHead>Reason</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mockReports.map((report) => (
+                          <TableRow key={report.id}>
+                            <TableCell>
+                              <Badge variant={report.type === "Question" ? "default" : "secondary"}>
+                                {report.type}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="max-w-xs truncate">
+                              {report.content}
+                            </TableCell>
+                            <TableCell>{report.reporter}</TableCell>
+                            <TableCell>{report.reason}</TableCell>
+                            <TableCell>{report.date}</TableCell>
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                <Button variant="outline" size="sm">
+                                  Dismiss
+                                </Button>
+                                <Button variant="destructive" size="sm">
+                                  Delete
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+
+          {activeTab === "topics" && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Topic Management</h2>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Topic
+                </Button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {["Contract Law", "Criminal Law", "Constitutional Law", "Tort Law", "Property Law", "Civil Procedure"].map((topic, index) => (
+                  <Card key={topic}>
+                    <CardHeader>
+                      <CardTitle className="text-lg">{topic}</CardTitle>
+                      <CardDescription>{Math.floor(Math.random() * 100) + 50} questions</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold">System Settings</h2>
+              
+              <div className="grid gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Platform Configuration</CardTitle>
+                    <CardDescription>Manage general platform settings</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span>Enable User Registrations</span>
+                      <Button variant="outline">Toggle</Button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Auto-hide reported content (3+ reports)</span>
+                      <Button variant="outline">Toggle</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Content Moderation</CardTitle>
+                    <CardDescription>Set thresholds and rules for content moderation</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span>Reports threshold for auto-hide</span>
+                      <Input type="number" defaultValue="3" className="w-20" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Enable automatic spam detection</span>
+                      <Button variant="outline">Toggle</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "logs" && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold">Activity Logs</h2>
+              
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Timestamp</TableHead>
+                      <TableHead>Admin</TableHead>
+                      <TableHead>Action</TableHead>
+                      <TableHead>Target</TableHead>
+                      <TableHead>Details</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>2024-01-25 14:30</TableCell>
+                      <TableCell>admin_user</TableCell>
+                      <TableCell>User Banned</TableCell>
+                      <TableCell>mike_student</TableCell>
+                      <TableCell>Violation of community guidelines</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>2024-01-25 14:25</TableCell>
+                      <TableCell>admin_user</TableCell>
+                      <TableCell>Content Deleted</TableCell>
+                      <TableCell>Question #892</TableCell>
+                      <TableCell>Inappropriate content</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>2024-01-25 14:20</TableCell>
+                      <TableCell>moderator_1</TableCell>
+                      <TableCell>Report Dismissed</TableCell>
+                      <TableCell>Answer #1234</TableCell>
+                      <TableCell>No violation found</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </Card>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Admin;
