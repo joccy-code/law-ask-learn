@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Users, 
   MessageSquare, 
@@ -26,6 +28,9 @@ import {
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [banDialogOpen, setBanDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const { toast } = useToast();
 
   // Mock data
   const dashboardStats = {
@@ -50,6 +55,23 @@ const Admin = () => {
     { id: 1, type: "Question", content: "Contract Law Question about...", reporter: "user123", reason: "Inappropriate content", date: "2024-01-25" },
     { id: 2, type: "Answer", content: "The answer to this question...", reporter: "user456", reason: "Spam", date: "2024-01-24" },
   ];
+
+  const handleBanUser = (user: any) => {
+    setSelectedUser(user);
+    setBanDialogOpen(true);
+  };
+
+  const confirmBanUser = () => {
+    if (selectedUser) {
+      toast({
+        title: "User Banned",
+        description: `${selectedUser.username} has been banned from the platform.`,
+        variant: "destructive"
+      });
+      setBanDialogOpen(false);
+      setSelectedUser(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -261,7 +283,12 @@ const Admin = () => {
                             <Button variant="ghost" size="sm">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleBanUser(user)}
+                              disabled={user.status === "Banned"}
+                            >
                               <Ban className="h-4 w-4" />
                             </Button>
                           </div>
@@ -516,6 +543,44 @@ const Admin = () => {
           )}
         </main>
       </div>
+
+      {/* Ban User Warning Dialog */}
+      <AlertDialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Ban User Warning
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                You are about to ban <strong>{selectedUser?.username}</strong> from the Law Q&A platform.
+              </p>
+              <p className="text-destructive font-medium">
+                This action will:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>Prevent the user from logging into their account</li>
+                <li>Hide all their questions and answers from public view</li>
+                <li>Remove their ability to participate in the community</li>
+                <li>Require admin intervention to restore access</li>
+              </ul>
+              <p className="text-muted-foreground text-sm mt-4">
+                Please ensure you have reviewed the user's activity and this action is justified according to platform guidelines.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmBanUser}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Confirm Ban
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
