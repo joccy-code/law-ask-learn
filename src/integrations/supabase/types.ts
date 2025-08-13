@@ -275,6 +275,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_warnings: {
+        Row: {
+          acknowledged_at: string | null
+          created_at: string
+          description: string
+          expires_at: string | null
+          id: string
+          is_acknowledged: boolean
+          issued_by: string
+          related_content_id: string | null
+          related_content_type: string | null
+          severity: Database["public"]["Enums"]["warning_severity"]
+          title: string
+          user_id: string
+          warning_type: Database["public"]["Enums"]["warning_type"]
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          created_at?: string
+          description: string
+          expires_at?: string | null
+          id?: string
+          is_acknowledged?: boolean
+          issued_by: string
+          related_content_id?: string | null
+          related_content_type?: string | null
+          severity?: Database["public"]["Enums"]["warning_severity"]
+          title: string
+          user_id: string
+          warning_type: Database["public"]["Enums"]["warning_type"]
+        }
+        Update: {
+          acknowledged_at?: string | null
+          created_at?: string
+          description?: string
+          expires_at?: string | null
+          id?: string
+          is_acknowledged?: boolean
+          issued_by?: string
+          related_content_id?: string | null
+          related_content_type?: string | null
+          severity?: Database["public"]["Enums"]["warning_severity"]
+          title?: string
+          user_id?: string
+          warning_type?: Database["public"]["Enums"]["warning_type"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -291,6 +339,14 @@ export type Database = {
     Enums: {
       question_status: "open" | "closed" | "resolved"
       user_role: "user" | "moderator" | "admin"
+      warning_severity: "low" | "medium" | "high" | "critical"
+      warning_type:
+        | "spam"
+        | "inappropriate_content"
+        | "harassment"
+        | "plagiarism"
+        | "off_topic"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -420,6 +476,15 @@ export const Constants = {
     Enums: {
       question_status: ["open", "closed", "resolved"],
       user_role: ["user", "moderator", "admin"],
+      warning_severity: ["low", "medium", "high", "critical"],
+      warning_type: [
+        "spam",
+        "inappropriate_content",
+        "harassment",
+        "plagiarism",
+        "off_topic",
+        "other",
+      ],
     },
   },
 } as const

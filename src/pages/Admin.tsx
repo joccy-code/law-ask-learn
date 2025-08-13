@@ -6,6 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Users, 
@@ -29,7 +33,15 @@ import {
 const Admin = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [banDialogOpen, setBanDialogOpen] = useState(false);
+  const [warningDialogOpen, setWarningDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [warningForm, setWarningForm] = useState({
+    type: "",
+    severity: "medium",
+    title: "",
+    description: ""
+  });
   const { toast } = useToast();
 
   // Mock data
@@ -52,8 +64,8 @@ const Admin = () => {
   ];
 
   const mockReports = [
-    { id: 1, type: "Question", content: "Contract Law Question about...", reporter: "user123", reason: "Inappropriate content", date: "2024-01-25" },
-    { id: 2, type: "Answer", content: "The answer to this question...", reporter: "user456", reason: "Spam", date: "2024-01-24" },
+    { id: 1, type: "Question", content: "Contract Law Question about...", reporter: "user123", reason: "Inappropriate content", date: "2024-01-25", reportedUser: "john_law" },
+    { id: 2, type: "Answer", content: "The answer to this question...", reporter: "user456", reason: "Spam", date: "2024-01-24", reportedUser: "mike_student" },
   ];
 
   const handleBanUser = (user: any) => {
@@ -70,6 +82,35 @@ const Admin = () => {
       });
       setBanDialogOpen(false);
       setSelectedUser(null);
+    }
+  };
+
+  const handleIssueWarning = (report: any) => {
+    setSelectedReport(report);
+    setWarningForm({
+      type: "",
+      severity: "medium",
+      title: "",
+      description: ""
+    });
+    setWarningDialogOpen(true);
+  };
+
+  const submitWarning = () => {
+    if (selectedReport && warningForm.title && warningForm.description && warningForm.type) {
+      toast({
+        title: "Warning Issued",
+        description: `Warning has been sent to ${selectedReport.reportedUser} for ${warningForm.type}.`,
+        variant: "default"
+      });
+      setWarningDialogOpen(false);
+      setSelectedReport(null);
+      setWarningForm({
+        type: "",
+        severity: "medium",
+        title: "",
+        description: ""
+      });
     }
   };
 
@@ -385,6 +426,7 @@ const Admin = () => {
                           <TableHead>Type</TableHead>
                           <TableHead>Content Preview</TableHead>
                           <TableHead>Reporter</TableHead>
+                          <TableHead>Reported User</TableHead>
                           <TableHead>Reason</TableHead>
                           <TableHead>Date</TableHead>
                           <TableHead>Actions</TableHead>
@@ -402,10 +444,20 @@ const Admin = () => {
                               {report.content}
                             </TableCell>
                             <TableCell>{report.reporter}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{report.reportedUser}</Badge>
+                            </TableCell>
                             <TableCell>{report.reason}</TableCell>
                             <TableCell>{report.date}</TableCell>
                             <TableCell>
                               <div className="flex space-x-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleIssueWarning(report)}
+                                >
+                                  Issue Warning
+                                </Button>
                                 <Button variant="outline" size="sm">
                                   Dismiss
                                 </Button>
@@ -581,6 +633,89 @@ const Admin = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Issue Warning Dialog */}
+      <Dialog open={warningDialogOpen} onOpenChange={setWarningDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              Issue Warning to {selectedReport?.reportedUser}
+            </DialogTitle>
+            <DialogDescription>
+              Issue a formal warning to the user for violating platform guidelines.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="warning-type">Warning Type</Label>
+              <Select value={warningForm.type} onValueChange={(value) => setWarningForm({...warningForm, type: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select warning type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="spam">Spam</SelectItem>
+                  <SelectItem value="inappropriate_content">Inappropriate Content</SelectItem>
+                  <SelectItem value="harassment">Harassment</SelectItem>
+                  <SelectItem value="plagiarism">Plagiarism</SelectItem>
+                  <SelectItem value="off_topic">Off Topic</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="severity">Severity</Label>
+              <Select value={warningForm.severity} onValueChange={(value) => setWarningForm({...warningForm, severity: value})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="warning-title">Warning Title</Label>
+              <Input
+                id="warning-title"
+                placeholder="Enter warning title"
+                value={warningForm.title}
+                onChange={(e) => setWarningForm({...warningForm, title: e.target.value})}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="warning-description">Warning Description</Label>
+              <Textarea
+                id="warning-description"
+                placeholder="Provide detailed explanation of the violation and expected behavior"
+                value={warningForm.description}
+                onChange={(e) => setWarningForm({...warningForm, description: e.target.value})}
+                rows={4}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setWarningDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={submitWarning}
+              disabled={!warningForm.title || !warningForm.description || !warningForm.type}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black"
+            >
+              Issue Warning
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
